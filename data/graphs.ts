@@ -53,7 +53,7 @@ export const grafcetPrincipal: GrafcetData = {
     { from: { x: COL_CENTER, y: Y_START + Y_GAP * 7 + 20 }, to: { x: COL_CENTER, y: Y_START + Y_GAP * 7 + 60 }, type: 'vertical' },
     { from: { x: COL_CENTER, y: Y_START + Y_GAP * 7 + 60 }, to: { x: COL_CENTER, y: Y_START + Y_GAP * 8 - 20 }, type: 'vertical' },
     { from: { x: COL_CENTER, y: Y_START + Y_GAP * 8 + 20 }, to: { x: COL_CENTER, y: Y_START + Y_GAP * 8 + 60 }, type: 'vertical' },
-    
+
     // Loopback 8 -> 0
     { from: { x: COL_CENTER, y: Y_START + Y_GAP * 8 + 60 }, to: { x: COL_CENTER - 200, y: Y_START + Y_GAP * 8 + 60 }, type: 'elbow' },
     { from: { x: COL_CENTER - 200, y: Y_START + Y_GAP * 8 + 60 }, to: { x: COL_CENTER - 200, y: Y_START - 30 }, type: 'vertical' },
@@ -65,60 +65,65 @@ export const grafcetPrincipal: GrafcetData = {
 export const grafcetHoming: GrafcetData = {
   title: "SOUS-GRAFCET : HOMING",
   description: "Initialisation des Axes - Séquence Parallèle (ET)",
-  viewBox: "0 0 800 650",
+  viewBox: "0 0 1100 800",
   steps: [
-    { id: '10', stepNumber: '10', type: 'initial', x: COL_CENTER, y: 50, actions: [{ type: '', content: ["Lancement Homing", "Init_Homing := TRUE", "Status = 'En cours'"] }] },
-    { id: '12', stepNumber: '12', type: 'regular', x: COL_CENTER, y: 250, actions: [{ type: '', content: ["Homing Axe X", "MC_Home(AxeX)"] }] },
-    { id: '11', stepNumber: '11', type: 'regular', x: COL_LEFT, y: 250, actions: [{ type: '', content: ["Homing Axe Z", "MC_Home(AxeZ)"] }] },
-    { id: '13', stepNumber: '13', type: 'regular', x: COL_RIGHT, y: 250, actions: [{ type: '', content: ["Homing Axe Y", "MC_Home(AxeY)"] }] },
-    { id: '14', stepNumber: '14', type: 'regular', x: COL_CENTER, y: 450, actions: [{ type: '', content: ["Vérification positions", "Status_Homing = 'Terminé'"] }] },
+    { id: '10', stepNumber: '10', type: 'initial', x: 400, y: 60, actions: [{ type: '', content: ["Lancement Homing", "Init_Homing := TRUE", "Status = 'En cours'"] }] },
+    { id: '11', stepNumber: '11', type: 'regular', x: 100, y: 300, actions: [{ type: '', content: ["Homing Axe Z", "MC_Home(AxeZ)"] }] },
+    { id: '12', stepNumber: '12', type: 'regular', x: 400, y: 300, actions: [{ type: '', content: ["Homing Axe X", "MC_Home(AxeX)"] }] },
+    { id: '13', stepNumber: '13', type: 'regular', x: 700, y: 300, actions: [{ type: '', content: ["Homing Axe Y", "MC_Home(AxeY)"] }] },
+    { id: '14', stepNumber: '14', type: 'regular', x: 400, y: 520, actions: [{ type: '', content: ["Vérification positions", "Status_Homing = 'Terminé'"] }] },
   ],
   transitions: [
-    { 
-      id: 't10', 
-      from: '10', 
-      to: ['11', '12', '13'], 
-      condition: "Init_Homing • Sécurités_OK", 
-      x: COL_CENTER, 
-      y: 130, 
-      type: 'divergence_and' 
-    },
-    { 
-      id: 't14', 
-      from: ['11', '12', '13'], 
-      to: '14', 
-      condition: "AxeX.Done • AxeY.Done • AxeZ.Done • Timeout < 30s", 
-      x: COL_CENTER, 
-      y: 350, 
-      type: 'convergence_and' 
+    {
+      id: 't10',
+      from: '10',
+      to: ['11', '12', '13'],
+      condition: "Init_Homing • Sécurités_OK",
+      x: 400,
+      y: 160,
+      type: 'divergence_and'
     },
     {
-       id: 't_return',
-       from: '14',
-       to: [], // End of sub grafcet
-       condition: "Axes_Referenced • Pas_Alarme",
-       x: COL_CENTER,
-       y: 550
+      id: 't14',
+      from: ['11', '12', '13'],
+      to: '14',
+      condition: "AxeX.Done • AxeY.Done • AxeZ.Done • Timeout < 30s",
+      x: 400,
+      y: 420,
+      type: 'convergence_and'
+    },
+    {
+      id: 't_return',
+      from: '14',
+      to: [], // End of sub grafcet
+      condition: "Axes_Referenced • Pas_Alarme",
+      x: 400,
+      y: 640
     }
   ],
   links: [
-    { from: {x: COL_CENTER, y: 70}, to: {x: COL_CENTER, y: 130}, type: 'vertical'},
-    // Div And
-    { from: {x: COL_CENTER, y: 135}, to: {x: COL_CENTER, y: 230}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 135}, to: {x: COL_LEFT, y: 135}, type: 'elbow'},
-    { from: {x: COL_LEFT, y: 135}, to: {x: COL_LEFT, y: 230}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 135}, to: {x: COL_RIGHT, y: 135}, type: 'elbow'},
-    { from: {x: COL_RIGHT, y: 135}, to: {x: COL_RIGHT, y: 230}, type: 'vertical'},
-    
-    // Conv And
-    { from: {x: COL_CENTER, y: 270}, to: {x: COL_CENTER, y: 345}, type: 'vertical'},
-    { from: {x: COL_LEFT, y: 270}, to: {x: COL_LEFT, y: 345}, type: 'vertical'},
-    { from: {x: COL_RIGHT, y: 270}, to: {x: COL_RIGHT, y: 345}, type: 'vertical'},
-    { from: {x: COL_LEFT, y: 345}, to: {x: COL_CENTER, y: 345}, type: 'elbow'},
-    { from: {x: COL_RIGHT, y: 345}, to: {x: COL_CENTER, y: 345}, type: 'elbow'},
-    
-    { from: {x: COL_CENTER, y: 355}, to: {x: COL_CENTER, y: 430}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 470}, to: {x: COL_CENTER, y: 550}, type: 'vertical'},
+    // Step 10 → Transition t10 (simple bar at y=160)
+    { from: { x: 400, y: 80 }, to: { x: 400, y: 179.5 }, type: 'vertical' },
+
+    // Divergence AND — branches from AND bars (at y=185) to steps 11, 12, 13
+    { from: { x: 400, y: 190 }, to: { x: 400, y: 280 }, type: 'vertical' },     // Center branch → step 12
+    { from: { x: 400, y: 190 }, to: { x: 100, y: 190 }, type: 'elbow' },         // Left rail
+    { from: { x: 100, y: 190 }, to: { x: 100, y: 280 }, type: 'vertical' },      // Left branch → step 11
+    { from: { x: 400, y: 190 }, to: { x: 700, y: 190 }, type: 'elbow' },         // Right rail
+    { from: { x: 700, y: 190 }, to: { x: 700, y: 280 }, type: 'vertical' },      // Right branch → step 13
+
+    // Convergence AND — steps 11, 12, 13 → AND bars (at y=420)
+    { from: { x: 400, y: 320 }, to: { x: 400, y: 415 }, type: 'vertical' },      // Step 12 → convergence
+    { from: { x: 100, y: 320 }, to: { x: 100, y: 415 }, type: 'vertical' },      // Step 11 → convergence
+    { from: { x: 700, y: 320 }, to: { x: 700, y: 415 }, type: 'vertical' },      // Step 13 → convergence
+    { from: { x: 100, y: 415 }, to: { x: 400, y: 415 }, type: 'elbow' },         // Left rail join
+    { from: { x: 700, y: 415 }, to: { x: 400, y: 415 }, type: 'elbow' },         // Right rail join
+
+    // Transition t14 (simple bar at y=445) → Step 14
+    { from: { x: 400, y: 425.5 }, to: { x: 400, y: 500 }, type: 'vertical' },
+
+    // Step 14 → Transition t_return
+    { from: { x: 400, y: 540 }, to: { x: 400, y: 640 }, type: 'vertical' },
   ]
 };
 
@@ -127,11 +132,11 @@ export const grafcetUsinage: GrafcetData = {
   description: "Interpolation 3 Axes - Boucle itérative",
   viewBox: "0 0 800 900",
   steps: [
-    { id: '50', stepNumber: '50', type: 'initial', x: COL_CENTER, y: 50, actions: [{type: '', content: ["Chargement G-Code", "Current_Point := 0"]}] },
-    { id: '51', stepNumber: '51', type: 'regular', x: COL_CENTER, y: 200, actions: [{type: '', content: ["Approche point départ", "Velocity := 2000 mm/min"]}] },
-    { id: '52', stepNumber: '52', type: 'regular', x: COL_CENTER, y: 350, actions: [{type: '', content: ["Descente Z", "Velocity := 500 mm/min"]}] },
-    { id: '53', stepNumber: '53', type: 'regular', x: COL_CENTER, y: 500, actions: [{type: '', content: ["Usinage interpolé (BOUCLE)", "MC_MoveSuperimposed", "Current_Point++"]}] },
-    { id: '54', stepNumber: '54', type: 'regular', x: COL_CENTER, y: 650, actions: [{type: '', content: ["Fin trajectoire", "Status = 'Terminé'"]}] },
+    { id: '50', stepNumber: '50', type: 'initial', x: COL_CENTER, y: 50, actions: [{ type: '', content: ["Chargement G-Code", "Current_Point := 0"] }] },
+    { id: '51', stepNumber: '51', type: 'regular', x: COL_CENTER, y: 200, actions: [{ type: '', content: ["Approche point départ", "Velocity := 2000 mm/min"] }] },
+    { id: '52', stepNumber: '52', type: 'regular', x: COL_CENTER, y: 350, actions: [{ type: '', content: ["Descente Z", "Velocity := 500 mm/min"] }] },
+    { id: '53', stepNumber: '53', type: 'regular', x: COL_CENTER, y: 500, actions: [{ type: '', content: ["Usinage interpolé (BOUCLE)", "MC_MoveSuperimposed", "Current_Point++"] }] },
+    { id: '54', stepNumber: '54', type: 'regular', x: COL_CENTER, y: 650, actions: [{ type: '', content: ["Fin trajectoire", "Status = 'Terminé'"] }] },
   ],
   transitions: [
     { id: 't50', from: '50', to: '51', condition: "Buffer_Chargé • Max_Points > 0", x: COL_CENTER, y: 125 },
@@ -140,32 +145,32 @@ export const grafcetUsinage: GrafcetData = {
     { id: 't53', from: '53', to: '54', condition: "Current_Point = Max_Points", x: COL_CENTER, y: 575 },
     // Loop transition needs special handling
     { id: 't53_loop', from: '53', to: '53', condition: "Current_Point < Max_Points", x: COL_CENTER - 100, y: 575, labelPos: 'left' },
-     {
-       id: 't_return_u',
-       from: '54',
-       to: [],
-       condition: "Trajectoire_Terminée",
-       x: COL_CENTER,
-       y: 750
+    {
+      id: 't_return_u',
+      from: '54',
+      to: [],
+      condition: "Trajectoire_Terminée",
+      x: COL_CENTER,
+      y: 750
     }
   ],
   links: [
-    { from: {x: COL_CENTER, y: 70}, to: {x: COL_CENTER, y: 125}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 125}, to: {x: COL_CENTER, y: 180}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 220}, to: {x: COL_CENTER, y: 275}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 275}, to: {x: COL_CENTER, y: 330}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 370}, to: {x: COL_CENTER, y: 425}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 425}, to: {x: COL_CENTER, y: 480}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 520}, to: {x: COL_CENTER, y: 575}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 575}, to: {x: COL_CENTER, y: 630}, type: 'vertical'},
-    { from: {x: COL_CENTER, y: 670}, to: {x: COL_CENTER, y: 750}, type: 'vertical'},
+    { from: { x: COL_CENTER, y: 70 }, to: { x: COL_CENTER, y: 125 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 125 }, to: { x: COL_CENTER, y: 180 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 220 }, to: { x: COL_CENTER, y: 275 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 275 }, to: { x: COL_CENTER, y: 330 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 370 }, to: { x: COL_CENTER, y: 425 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 425 }, to: { x: COL_CENTER, y: 480 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 520 }, to: { x: COL_CENTER, y: 575 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 575 }, to: { x: COL_CENTER, y: 630 }, type: 'vertical' },
+    { from: { x: COL_CENTER, y: 670 }, to: { x: COL_CENTER, y: 750 }, type: 'vertical' },
 
     // Loop link
-    { from: {x: COL_CENTER, y: 520}, to: {x: COL_CENTER, y: 540}, type: 'vertical'}, // Start from step 53 bottom
-    { from: {x: COL_CENTER, y: 540}, to: {x: COL_CENTER - 100, y: 540}, type: 'elbow'}, // Go left
-    { from: {x: COL_CENTER - 100, y: 540}, to: {x: COL_CENTER - 100, y: 575}, type: 'vertical'}, // Down to transition
-    { from: {x: COL_CENTER - 100, y: 575}, to: {x: COL_CENTER - 100, y: 480}, type: 'vertical'}, // Up from transition
-    { from: {x: COL_CENTER - 100, y: 480}, to: {x: COL_CENTER, y: 480}, type: 'elbow'}, // Back to Step 53 top
+    { from: { x: COL_CENTER, y: 520 }, to: { x: COL_CENTER, y: 540 }, type: 'vertical' }, // Start from step 53 bottom
+    { from: { x: COL_CENTER, y: 540 }, to: { x: COL_CENTER - 100, y: 540 }, type: 'elbow' }, // Go left
+    { from: { x: COL_CENTER - 100, y: 540 }, to: { x: COL_CENTER - 100, y: 575 }, type: 'vertical' }, // Down to transition
+    { from: { x: COL_CENTER - 100, y: 575 }, to: { x: COL_CENTER - 100, y: 480 }, type: 'vertical' }, // Up from transition
+    { from: { x: COL_CENTER - 100, y: 480 }, to: { x: COL_CENTER, y: 480 }, type: 'elbow' }, // Back to Step 53 top
   ]
 };
 
@@ -174,48 +179,48 @@ export const grafcetSecurite: GrafcetData = {
   description: "Surveillance parallèle permanente (Divergence OU)",
   viewBox: "0 0 900 600",
   steps: [
-    { id: 'S0', stepNumber: 'S0', type: 'initial', x: 450, y: 50, actions: [{type: '', content: ["Surveillance active", "Monitor_Arret_Urgence()", "Monitor_Zone()"]}] },
-    { id: 'S1', stepNumber: 'S1', type: 'regular', x: 150, y: 250, actions: [{type: '', content: ["Arrêt d'urgence", "MC_Stop(Tous, Decel:=Max)"]}] },
-    { id: 'S2', stepNumber: 'S2', type: 'regular', x: 450, y: 250, actions: [{type: '', content: ["Zone dépassée", "MC_Stop(Broche)", "Alarme_Zone := TRUE"]}] },
-    { id: 'S3', stepNumber: 'S3', type: 'regular', x: 750, y: 250, actions: [{type: '', content: ["Erreur Drive", "MC_Reset(Axe_Defaut)", "Attente acquittement"]}] },
-    { id: 'S4', stepNumber: 'S4', type: 'regular', x: 450, y: 450, actions: [{type: '', content: ["Réinitialisation", "Reset_Alarmes()", "Status_Sécu = 'OK'"]}] },
+    { id: 'S0', stepNumber: 'S0', type: 'initial', x: 450, y: 50, actions: [{ type: '', content: ["Surveillance active", "Monitor_Arret_Urgence()", "Monitor_Zone()"] }] },
+    { id: 'S1', stepNumber: 'S1', type: 'regular', x: 150, y: 250, actions: [{ type: '', content: ["Arrêt d'urgence", "MC_Stop(Tous, Decel:=Max)"] }] },
+    { id: 'S2', stepNumber: 'S2', type: 'regular', x: 450, y: 250, actions: [{ type: '', content: ["Zone dépassée", "MC_Stop(Broche)", "Alarme_Zone := TRUE"] }] },
+    { id: 'S3', stepNumber: 'S3', type: 'regular', x: 750, y: 250, actions: [{ type: '', content: ["Erreur Drive", "MC_Reset(Axe_Defaut)", "Attente acquittement"] }] },
+    { id: 'S4', stepNumber: 'S4', type: 'regular', x: 450, y: 450, actions: [{ type: '', content: ["Réinitialisation", "Reset_Alarmes()", "Status_Sécu = 'OK'"] }] },
   ],
   transitions: [
     { id: 'tS1', from: 'S0', to: 'S1', condition: "Arrêt_Urgence_Activé", x: 150, y: 150, type: 'divergence_or' },
     { id: 'tS2', from: 'S0', to: 'S2', condition: "Position > Max OR Position < Min", x: 450, y: 150, type: 'divergence_or' },
     { id: 'tS3', from: 'S0', to: 'S3', condition: "Erreur_Drive (MC_Power.Error)", x: 750, y: 150, type: 'divergence_or' },
-    
+
     { id: 'tS4', from: ['S1', 'S2', 'S3'], to: 'S4', condition: "Acquittement_Opérateur • Défaut_Résolu", x: 450, y: 350, type: 'convergence_or' },
-    
+
     { id: 'tLoop', from: 'S4', to: 'S0', condition: "Reset_Terminé • Sécurités_OK", x: 450, y: 550 },
   ],
   links: [
-    { from: {x: 450, y: 70}, to: {x: 450, y: 100}, type: 'vertical'},
+    { from: { x: 450, y: 70 }, to: { x: 450, y: 100 }, type: 'vertical' },
     // Div OR rail
-    { from: {x: 150, y: 100}, to: {x: 750, y: 100}, type: 'elbow'},
-    
-    { from: {x: 150, y: 100}, to: {x: 150, y: 150}, type: 'vertical'}, // to tS1
-    { from: {x: 450, y: 100}, to: {x: 450, y: 150}, type: 'vertical'}, // to tS2
-    { from: {x: 750, y: 100}, to: {x: 750, y: 150}, type: 'vertical'}, // to tS3
-    
-    { from: {x: 150, y: 150}, to: {x: 150, y: 230}, type: 'vertical'}, // tS1 to S1
-    { from: {x: 450, y: 150}, to: {x: 450, y: 230}, type: 'vertical'}, // tS2 to S2
-    { from: {x: 750, y: 150}, to: {x: 750, y: 230}, type: 'vertical'}, // tS3 to S3
-    
+    { from: { x: 150, y: 100 }, to: { x: 750, y: 100 }, type: 'elbow' },
+
+    { from: { x: 150, y: 100 }, to: { x: 150, y: 150 }, type: 'vertical' }, // to tS1
+    { from: { x: 450, y: 100 }, to: { x: 450, y: 150 }, type: 'vertical' }, // to tS2
+    { from: { x: 750, y: 100 }, to: { x: 750, y: 150 }, type: 'vertical' }, // to tS3
+
+    { from: { x: 150, y: 150 }, to: { x: 150, y: 230 }, type: 'vertical' }, // tS1 to S1
+    { from: { x: 450, y: 150 }, to: { x: 450, y: 230 }, type: 'vertical' }, // tS2 to S2
+    { from: { x: 750, y: 150 }, to: { x: 750, y: 230 }, type: 'vertical' }, // tS3 to S3
+
     // Conv OR
-    { from: {x: 150, y: 270}, to: {x: 150, y: 320}, type: 'vertical'},
-    { from: {x: 450, y: 270}, to: {x: 450, y: 320}, type: 'vertical'},
-    { from: {x: 750, y: 270}, to: {x: 750, y: 320}, type: 'vertical'},
-    
-    { from: {x: 150, y: 320}, to: {x: 750, y: 320}, type: 'elbow'}, // Convergence Rail
-    { from: {x: 450, y: 320}, to: {x: 450, y: 350}, type: 'vertical'}, // to Trans
-    { from: {x: 450, y: 350}, to: {x: 450, y: 430}, type: 'vertical'}, // to S4
-    
-    { from: {x: 450, y: 470}, to: {x: 450, y: 550}, type: 'vertical'}, // to tLoop
-    
+    { from: { x: 150, y: 270 }, to: { x: 150, y: 320 }, type: 'vertical' },
+    { from: { x: 450, y: 270 }, to: { x: 450, y: 320 }, type: 'vertical' },
+    { from: { x: 750, y: 270 }, to: { x: 750, y: 320 }, type: 'vertical' },
+
+    { from: { x: 150, y: 320 }, to: { x: 750, y: 320 }, type: 'elbow' }, // Convergence Rail
+    { from: { x: 450, y: 320 }, to: { x: 450, y: 350 }, type: 'vertical' }, // to Trans
+    { from: { x: 450, y: 350 }, to: { x: 450, y: 430 }, type: 'vertical' }, // to S4
+
+    { from: { x: 450, y: 470 }, to: { x: 450, y: 550 }, type: 'vertical' }, // to tLoop
+
     // Loop S4 -> S0
-    { from: {x: 450, y: 550}, to: {x: 850, y: 550}, type: 'elbow'},
-    { from: {x: 850, y: 550}, to: {x: 850, y: 70}, type: 'vertical'},
-    { from: {x: 850, y: 70}, to: {x: 470, y: 70}, type: 'elbow'},
+    { from: { x: 450, y: 550 }, to: { x: 850, y: 550 }, type: 'elbow' },
+    { from: { x: 850, y: 550 }, to: { x: 850, y: 70 }, type: 'vertical' },
+    { from: { x: 850, y: 70 }, to: { x: 470, y: 70 }, type: 'elbow' },
   ]
 };
